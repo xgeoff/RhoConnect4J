@@ -3,11 +3,14 @@ RhoConnect4J is a generic java library for communicating with a subset of RhoCon
 RhoConnect4J exposes api's in a simple Query-Create-Update-Delete format, so making calls from any java based program is simple and straightforward.
 
 The library has dependencies on the Simple JSON parser
->http://code.google.com/p/json-simple/
+
+    http://code.google.com/p/json-simple/
+
 which appears to be included with Eclipse (at least it was for me).  So if you have eclipse installed, you may already have the simple json lib.
 
 The only other dependency is my RestClient Library, whose source is available here:
->https://github.com/xgeoff/RestClient4J
+
+    https://github.com/xgeoff/RestClient4J
 
 So in order to use the RhoConnect4J client, first you will want to authenticate with the server. You do that as follows
     
