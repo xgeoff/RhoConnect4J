@@ -20,7 +20,8 @@ So in order to use the RhoConnect4J client, first you will want to authenticate 
     RhoConnectClient client = new RhoConnect4J(url);
     // The url is a String pointing to your RhoConnect Server
     client.authenticate("rhoadmin", "", params);
-    // The above authenticate method takes Strings for admin username and password.
+    // The above authenticate method takes Strings for admin username and password. The first parameter is the admin
+    //  username and the second parameter is the password.
 
 Note that the url will be the url for your RhoConnect server, and the credentials will be your admin user and password.
 
