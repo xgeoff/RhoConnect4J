@@ -10,7 +10,7 @@ which appears to be included with Eclipse (at least it was for me).  So if you h
 
 The only other dependency is my RestClient Library, whose source is available here:
 
-    https://github.com/xgeoff/RestClient4J
+https://github.com/xgeoff/RestClient4J
 
 So in order to use the RhoConnect4J client, first you will want to authenticate with the server. You do that as follows
     
