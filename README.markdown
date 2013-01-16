@@ -4,7 +4,7 @@ RhoConnect4J exposes api's in a simple Query-Create-Update-Delete format, so mak
 
 The library has dependencies on the Simple JSON parser
 
-    [http://code.google.com/p/json-simple/]
+http://code.google.com/p/json-simple/
 
 which appears to be included with Eclipse (at least it was for me).  So if you have eclipse installed, you may already have the simple json lib.
 
