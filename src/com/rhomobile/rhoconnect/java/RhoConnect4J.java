@@ -26,17 +26,19 @@ public class RhoConnect4J implements RhoConnectClient {
     protected static final String COOKIE_KEY = "Set-Cookie";
     protected static final String COOKIE_PARAM = "Cookie";
     
-    protected static final String LOGIN_URL_APPEND = "/login";
-    protected static final String QUERY_URL_APPEND = "/api/get_db_doc";
-    protected static final String UPDATE_URL_APPEND = "/api/push_objects";
+    protected static final String LOGIN_URL_APPEND = "/rc/v1/system/login";
+    protected static final String QUERY_URL_APPEND = "/rc/v1/store/";
+    protected static final String UPDATE_URL_APPEND = "/rc/v1/store/";
     protected static final String API_TOKEN_URL_APPEND = "/api/get_api_token";
     protected static final String DELETE_URL_APPEND = "/api/push_deletes";
     
-    protected static final String API_TOKEN_PARAM = "api_token";
+    protected static final String API_TOKEN_PARAM = "X-RhoConnect-API-TOKEN";
     protected static final String DOC_PARAM = "doc";
+    protected static final String DATA_PARAM = "data";
+    protected static final String APPEND_PARAM = "append";
     protected static final String CONTENT_TYPE_PARAM = "content-type";
-    protected static final String OBJECTS_PARAM = "objects";
-    protected static final String SOURCE_ID_PARAM = "source_id";
+    //protected static final String OBJECTS_PARAM = "objects";
+    //protected static final String SOURCE_ID_PARAM = "source_id";
     protected static final String USER_ID_PARAM = "user_id";
     protected static final String REBUILD_MD_PARAM = "rebuild_md";
     
@@ -67,20 +69,27 @@ public class RhoConnect4J implements RhoConnectClient {
             content = toJSON(credentials);
 
             response = RestClient4J.post(serverUrl + LOGIN_URL_APPEND, content, params);
-            List<String> cookieList = (List<String>) response.headers().get(COOKIE_KEY);
+            authToken = response.body();
+            
+            if (authToken != null && authToken.length() > 0) {
+                success = true;
+            }
+            /*List<String> cookieList = (List<String>) response.headers().get(COOKIE_KEY);
             
             if (cookieList.size() > 0) {
                 cookie = cookieList.get(0);
+                cookie = cookie.substring(19);
                 
                 params = new HashMap<String, String>();
                 params.put(COOKIE_PARAM, cookie);
-                response = RestClient4J.post(serverUrl + API_TOKEN_URL_APPEND, "", params);
-                authToken = response.body();
+                //response = RestClient4J.post(serverUrl + API_TOKEN_URL_APPEND, "", params);
+                //authToken = response.body();
+                authToken = cookie;
                 
                 if (authToken != null && authToken.length() > 0) {
                     success = true;
                 }
-            }
+            }*/
             
         } catch (MalformedURLException mue) {
             mue.printStackTrace();
@@ -106,8 +115,8 @@ public class RhoConnect4J implements RhoConnectClient {
             doc = buildDocString(resource, partition);
             deleteObjects.put(API_TOKEN_PARAM, authToken);
             deleteObjects.put(DOC_PARAM, doc);
-            deleteObjects.put(OBJECTS_PARAM, objectIds);
-            deleteObjects.put(SOURCE_ID_PARAM, resource);
+            //deleteObjects.put(OBJECTS_PARAM, objectIds);
+            //deleteObjects.put(SOURCE_ID_PARAM, resource);
             deleteObjects.put(USER_ID_PARAM, partition);
             String content = toJSON(deleteObjects);
             
@@ -138,12 +147,12 @@ public class RhoConnect4J implements RhoConnectClient {
             params = new HashMap<String, String>();
             doc = buildDocString(resource, partition);
             params.put(API_TOKEN_PARAM, authToken);
-            params.put(DOC_PARAM, doc);
+            //params.put(DOC_PARAM, doc);
             String content = toJSON(params);
             
-            params = new HashMap();
+            //params = new HashMap();
             params.put(CONTENT_TYPE_PARAM, JSON_CONTENT_TYPE);
-            response = RestClient4J.post(serverUrl + QUERY_URL_APPEND, content, params);
+            response = RestClient4J.get(serverUrl + QUERY_URL_APPEND + doc, params);
             data = toJSON(response.body());
             
         } catch (Exception e) {
@@ -165,16 +174,19 @@ public class RhoConnect4J implements RhoConnectClient {
         try {
             pushObjects = new HashMap<String, Object>();
             doc = buildDocString(resource, partition);
-            pushObjects.put(API_TOKEN_PARAM, authToken);
-            pushObjects.put(DOC_PARAM, doc);
-            pushObjects.put(OBJECTS_PARAM, data);
-            pushObjects.put(SOURCE_ID_PARAM, resource);
-            pushObjects.put(USER_ID_PARAM, partition);
-            pushObjects.put(REBUILD_MD_PARAM, Boolean.FALSE);
+            //pushObjects.put(API_TOKEN_PARAM, authToken);
+            //pushObjects.put(DOC_PARAM, doc);
+            //pushObjects.put(OBJECTS_PARAM, data);
+            //pushObjects.put(SOURCE_ID_PARAM, resource);
+            //pushObjects.put(USER_ID_PARAM, partition);
+            //pushObjects.put(REBUILD_MD_PARAM, Boolean.FALSE);
+            pushObjects.put(DATA_PARAM, data);
+            pushObjects.put(APPEND_PARAM, Boolean.TRUE);
             String content = toJSON(pushObjects);
             params = new HashMap<String, String>();
             params.put(CONTENT_TYPE_PARAM, JSON_CONTENT_TYPE);
-            response = RestClient4J.post(serverUrl + UPDATE_URL_APPEND, content, params);
+            params.put(API_TOKEN_PARAM, authToken);
+            response = RestClient4J.post(serverUrl + UPDATE_URL_APPEND + doc, content, params);
             
             if (response.code() == HttpURLConnection.HTTP_OK) {
                 success = true;
@@ -206,9 +218,9 @@ public class RhoConnect4J implements RhoConnectClient {
         
         doc = new StringBuilder();
         doc.append("source:application:");
-        doc.append(resource);
-        doc.append(":");
         doc.append(partition);
+        doc.append(":");
+        doc.append(resource);
         doc.append(":md");
         
         return doc.toString();
